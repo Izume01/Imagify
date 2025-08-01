@@ -24,3 +24,31 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+/* Clean minimal styles */
+
+/* Custom radial gradient */
+.bg-gradient-radial {
+  background: radial-gradient(circle at center, transparent 0%, transparent 50%, rgba(0, 0, 0, 0.5) 100%);
+}
+
+@layer utilities {
+  @variants responsive {
+    .masonry {
+      column-gap: 1.5em;
+      column-count: 1;
+    }
+    .masonry-sm {
+      column-count: 2;
+    }
+    .masonry-md {
+      column-count: 3;
+    }
+  }
+}
+
+
+.font-clash-display {
+  font-family: var(--font-clash-display);
+}

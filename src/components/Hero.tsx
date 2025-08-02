@@ -27,6 +27,10 @@ const Hero = () => {
 
         setIsGenerating(true);
         setGeneratedImages([]); // Clear previous images
+        
+        // Create placeholder array for skeleton loaders
+        const placeholders = Array(imageCount).fill(null);
+        setGeneratedImages(placeholders);
 
         try {
             const response = await fetch("/api/generate", {
@@ -50,7 +54,6 @@ const Hero = () => {
             if (data.image_urls) {
                 setGeneratedImages(data.image_urls);
 
-                // 🔥 Smooth scroll to the generated section
                 setTimeout(() => {
                     document.getElementById("generated-section")?.scrollIntoView({ behavior: "smooth" });
                 }, 100); // Slight delay to allow render
@@ -73,7 +76,7 @@ const Hero = () => {
     return (
         <>
             <div className=' hero'>
-                <div className={`flex flex-col items-center justify-center px-4 transition-all duration-500 ${generatedImages.length > 0 ? 'pt-10' : 'min-h-screen pt-24'}`}>
+                <div className={`flex flex-col items-center justify-center px-4 transition-all duration-500 ${generatedImages.length > 0 ? 'pt-40' : 'h-[70vh] pt-24'}`}>
                     {/* Fixed Header Section */}
                     <div className="flex flex-col items-center text-center">
                         <h1 className={`text-5xl font-medium font-clash-display flex gap-5 ${clashDisplay.variable}`}>
@@ -132,8 +135,8 @@ const Hero = () => {
                                     >
                                         {isGenerating ? (
                                             <>
-                                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                Generating...
+                                                <ArrowUp className="w-4 h-4" />
+                                                Generate
                                             </>
                                         ) : (
                                             <>
@@ -164,14 +167,28 @@ const Hero = () => {
                             key={index}
                             className="rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.02] bg-[#1e1e1e] p-2 w-full max-w-[400px]"
                         >
-                            <Image
-                                src={imageUrl}
-                                alt={`Generated Image ${index + 1}`}
-                                width={400}
-                                height={400}
-                                className="w-full h-auto object-contain rounded-xl"
-                                priority={index === 0}
-                            />
+                            {imageUrl ? (
+                                <Image
+                                    src={imageUrl}
+                                    alt={`Generated Image ${index + 1}`}
+                                    width={400}
+                                    height={400}
+                                    className="w-full h-auto object-contain rounded-xl"
+                                    priority={index === 0}
+                                />
+                            ) : (
+                                // Simple Skeleton Loader
+                                <div className="w-full aspect-square bg-gray-800 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                    {/* Simple shimmer effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-600/30 to-transparent animate-[shimmer_2s_ease-in-out_infinite]"></div>
+                                    
+                                    {/* Simple loading content */}
+                                    <div className="relative z-10 flex flex-col items-center justify-center space-y-3">
+                                        <div className="w-8 h-8 border-2 border-gray-400 border-t-white rounded-full animate-spin"></div>
+                                        <div className="text-gray-400 text-sm">Loading...</div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

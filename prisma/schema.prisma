@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -14,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Image {
+model FileMaker {
   id        String   @id @default(uuid())
   url       String
   createdAt DateTime @default(now())

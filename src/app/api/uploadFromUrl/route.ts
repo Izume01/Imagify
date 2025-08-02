@@ -36,12 +36,13 @@ export async function POST(req : NextRequest) {
     }
 
     console.log('Attempting to save to database...');
-    await prisma.fileMaker.create({
-        data : {
-            url: result.secure_url,
-            createdAt: new Date(),                                                              
-        } 
+    const file = await prisma.fileMaker.create({
+      data : {
+        url : result.secure_url,
+        createdAt : new Date(),
+      }
     })
+    console.log('File created:', file);
     console.log('Database save successful');
 
     return Response.json({ url: result.secure_url }, { status: 200 });

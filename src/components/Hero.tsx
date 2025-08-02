@@ -76,20 +76,20 @@ const Hero = () => {
     return (
         <>
             <div className=' hero'>
-                <div className={`flex flex-col items-center justify-center px-4 transition-all duration-500 ${generatedImages.length > 0 ? 'pt-40' : 'h-[70vh] pt-24'}`}>
+                <div className={`flex flex-col items-center justify-center px-4 transition-all duration-500 ${generatedImages.length > 0 ? 'pt-20 sm:pt-40' : 'min-h-[60vh] sm:h-[70vh] pt-12 sm:pt-24'}`}>
                     {/* Fixed Header Section */}
                     <div className="flex flex-col items-center text-center">
-                        <h1 className={`text-5xl font-medium font-clash-display flex gap-5 ${clashDisplay.variable}`}>
-                            Visualize your ideas <span className='text-red-500 animate-[pulse_2s_ease-in-out_infinite] scale-125 rotate-12 tilt-12 transition-all duration-1000'><Heart className='w-10 h-10 drop-shadow-lg' fill="currentColor" /></span> With <span className="bg-gradient-to-r from-fuchsia-500 via-pink-500 to-red-500 text-transparent bg-clip-text">
+                        <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-medium font-clash-display flex flex-col sm:flex-row gap-2 sm:gap-5 items-center ${clashDisplay.variable}`}>
+                            Visualize your ideas <span className='text-red-500 animate-[pulse_2s_ease-in-out_infinite] scale-125 rotate-12 tilt-12 transition-all duration-1000'><Heart className='w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 drop-shadow-lg' fill="currentColor" /></span> With <span className="bg-gradient-to-r from-fuchsia-500 via-pink-500 to-red-500 text-transparent bg-clip-text">
                                 Imagify
                             </span>
                         </h1>
 
-                        <div className='tracking-wide text-gray-400 text-center font-clash-display mt-5 max-w-2xl mx-auto leading-relaxed text-lg'>
+                        <div className='tracking-wide text-gray-400 text-center font-clash-display mt-3 sm:mt-5 max-w-xl sm:max-w-2xl mx-auto leading-relaxed text-sm sm:text-base lg:text-lg px-4'>
                             Let your ideas stand out with one-of-a-kind AI-generated visuals
                         </div>
 
-                        <div className="flex justify-center mt-10 w-full max-w-[800px]">
+                        <div className="flex justify-center mt-6 sm:mt-10 w-full max-w-xs sm:max-w-md lg:max-w-[800px] px-4">
                             <div className="relative w-full bg-[#1e1e1e] rounded-3xl p-6 space-y-4">
                                 {/* Input Field */}
                                 <input
@@ -97,14 +97,14 @@ const Hero = () => {
                                     onChange={(e) => setUserPrompt(e.target.value)}
                                     type="text"
                                     placeholder="Describe the image you want to generate..."
-                                    className="w-full h-12 px-4 bg-[#2a2a2a] rounded-xl outline-none text-white text-base placeholder:text-gray-400 border border-gray-600 focus:border-purple-500 transition-colors"
+                                    className="w-full h-10 sm:h-12 px-3 sm:px-4 bg-[#2a2a2a] rounded-xl outline-none text-white text-sm sm:text-base placeholder:text-gray-400 border border-gray-600 focus:border-purple-500 transition-colors"
                                 />
 
                                 {/* Controls Row */}
-                                <div className="flex justify-between items-center">
+                                <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0">
                                     {/* Image Count Selector */}
                                     <div className="flex items-center gap-3">
-                                        <span className="text-gray-400 text-sm">Images:</span>
+                                        <span className="text-gray-400 text-xs sm:text-sm">Images:</span>
                                         <div className="flex items-center gap-2 bg-[#2a2a2a] rounded-lg p-1">
                                             <button
                                                 type="button"
@@ -131,7 +131,7 @@ const Hero = () => {
                                         type="submit"
                                         onClick={(e) => handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>)}
                                         disabled={isGenerating || !userprompt.trim()}
-                                        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-2 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2"
+                                        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 sm:px-6 py-2 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center"
                                     >
                                         {isGenerating ? (
                                             <>
@@ -153,19 +153,19 @@ const Hero = () => {
             </div>
 
             {/* Generated Images Section */}
-            <div id="generated-section" className="w-full max-w-[1200px] mx-auto px-4 py-10">
+            <div id="generated-section" className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
                 <div
-                    className={`grid gap-6 justify-items-center ${generatedImages.length === 1
-                        ? 'grid-cols-1'
+                    className={`grid gap-4 sm:gap-6 justify-items-center ${generatedImages.length === 1
+                        ? 'grid-cols-1 max-w-md mx-auto'
                         : generatedImages.length === 2
-                            ? 'grid-cols-1 md:grid-cols-2'
-                            : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                            ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto'
+                            : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
                         }`}
                 >
                     {generatedImages.map((imageUrl, index) => (
                         <div
                             key={index}
-                            className="rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.02] bg-[#1e1e1e] p-2 w-full max-w-[400px]"
+                            className="rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.02] bg-[#1e1e1e] p-1 sm:p-2 w-full max-w-[300px] sm:max-w-[400px]"
                         >
                             {imageUrl ? (
                                 <Image

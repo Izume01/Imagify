@@ -42,12 +42,12 @@ const images = [
 
 const Display = () => {
     return (
-        <div className="p-6 max-w-7xl mx-auto ">
-            <h1 className={`text-4xl font-extrabold text-white mb-10 leading-tight tracking-tight ${dmSans.className}`}>
-                Explore what the community<br />is building with <span className="text-purple-400">Imagify </span>.
+        <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+            <h1 className={`text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-6 sm:mb-10 leading-tight tracking-tight px-2 ${dmSans.className}`}>
+                Explore what the community<br className="hidden sm:block" /><span className="sm:hidden"> </span>is building with <span className="text-purple-400">Imagify</span>.
             </h1>
 
-            <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
+            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-3 sm:gap-4 space-y-3 sm:space-y-4 px-2">
                 {images.map((image, index) => (
                     <div
                         key={index}

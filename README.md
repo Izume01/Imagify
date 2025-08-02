@@ -2,6 +2,8 @@
 
 Imagify is a modern, AI-powered image generation web application. It allows users to bring their creative ideas to life by generating unique visuals from simple text prompts. Built with Next.js and styled with Tailwind CSS, it features a sleek, interactive, and responsive user interface.
 
+![Alt text](image.png)
+
 ## ✨ Key Features
 
 - **AI-Powered Image Generation**: Convert text descriptions into stunning images.

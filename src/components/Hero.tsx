@@ -1,9 +1,10 @@
 "use client"
 import { Heart, ArrowUp, Plus, Minus } from 'lucide-react'
-import React, { useState } from 'react'
+import React from 'react'
 import { clashDisplay } from '@/lib/fonts'
 import useAppStore from '@/store/appStore'
 import Image from 'next/image'
+import { BorderBeam } from './magicui/border-beam'
 
 const Hero = () => {
     const {
@@ -27,8 +28,7 @@ const Hero = () => {
 
         setIsGenerating(true);
         setGeneratedImages([]); // Clear previous images
-        
-        // Create placeholder array for skeleton loaders
+
         const placeholders = Array(imageCount).fill(null);
         setGeneratedImages(placeholders);
 
@@ -53,10 +53,9 @@ const Hero = () => {
 
             if (data.image_urls) {
                 setGeneratedImages(data.image_urls);
-
                 setTimeout(() => {
                     document.getElementById("generated-section")?.scrollIntoView({ behavior: "smooth" });
-                }, 100); // Slight delay to allow render
+                }, 100);
             }
 
         } catch (error) {
@@ -75,12 +74,11 @@ const Hero = () => {
 
     return (
         <>
-            <div className=' hero'>
+            <div className='hero'>
                 <div className={`flex flex-col items-center justify-center px-4 transition-all duration-500 ${generatedImages.length > 0 ? 'pt-20 sm:pt-40' : 'min-h-[60vh] sm:h-[70vh] pt-12 sm:pt-24'}`}>
-                    {/* Fixed Header Section */}
                     <div className="flex flex-col items-center text-center">
-                        <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-medium font-clash-display flex flex-col sm:flex-row gap-2 sm:gap-5 items-center ${clashDisplay.variable}`}>
-                            Visualize your ideas <span className='text-red-500 animate-[pulse_2s_ease-in-out_infinite] scale-125 rotate-12 tilt-12 transition-all duration-1000'><Heart className='w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 drop-shadow-lg' fill="currentColor" /></span> With <span className="bg-gradient-to-r from-fuchsia-500 via-pink-500 to-red-500 text-transparent bg-clip-text">
+                        <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-medium font-clash-display flex flex-col sm:flex-row gap-2 sm:gap-5 text-white items-center ${clashDisplay.variable}`}>
+                            Visualize your ideas <span className='text-red-500 animate-[pulse_2s_ease-in-out_infinite] scale-125 rotate-12 transition-all duration-1000'><Heart className='w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 drop-shadow-lg' fill="currentColor" /></span> With <span className="bg-gradient-to-r from-fuchsia-500 via-pink-500 to-red-500 text-transparent bg-clip-text">
                                 Imagify
                             </span>
                         </h1>
@@ -89,18 +87,25 @@ const Hero = () => {
                             Let your ideas stand out with one-of-a-kind AI-generated visuals
                         </div>
 
-                        <div className="flex justify-center mt-6 sm:mt-10 w-full max-w-xs sm:max-w-md lg:max-w-[800px] px-4">
-                            <div className="relative w-full bg-[#1e1e1e] rounded-3xl p-6 space-y-4">
-                                {/* Input Field */}
-                                <input
-                                    value={userprompt}
-                                    onChange={(e) => setUserPrompt(e.target.value)}
-                                    type="text"
-                                    placeholder="Describe the image you want to generate..."
-                                    className="w-full h-10 sm:h-12 px-3 sm:px-4 bg-[#2a2a2a] rounded-xl outline-none text-white text-sm sm:text-base placeholder:text-gray-400 border border-gray-600 focus:border-purple-500 transition-colors"
-                                />
+                        <form onSubmit={handleSubmit} className="flex justify-center mt-6 sm:mt-10 w-full max-w-xs sm:max-w-md lg:max-w-[800px] px-4">
+                            <div className="relative w-full h-full bg-[#1e1e1e] rounded-3xl p-6 space-y-4">
 
-                                {/* Controls Row */}
+                                <div className='relative rounded-xl overflow-hidden'>
+                                    <input
+                                        value={userprompt}
+                                        onChange={(e) => setUserPrompt(e.target.value)}
+                                        type="text"
+                                        placeholder="Describe the image you want to generate..."
+                                        className="w-full h-10 sm:h-12 px-3 sm:px-4 bg-[#2a2a2a] rounded-xl outline-none text-white text-sm sm:text-base placeholder:text-gray-400 border border-gray-600 transition-colors"
+                                    />
+                                    <BorderBeam
+                                        duration={6}
+                                        delay={3}
+                                        size={400}
+                                        className="from-transparent via-blue-500 to-transparent !rounded-xl"
+                                    />
+                                </div>
+
                                 <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0">
                                     {/* Image Count Selector */}
                                     <div className="flex items-center gap-3">
@@ -129,25 +134,15 @@ const Hero = () => {
                                     {/* Generate Button */}
                                     <button
                                         type="submit"
-                                        onClick={(e) => handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>)}
                                         disabled={isGenerating || !userprompt.trim()}
-                                        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 sm:px-6 py-2 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center"
+                                        className="bg-gradient-to-r bg-neutral-700 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center hover:bg-neutral-600"
                                     >
-                                        {isGenerating ? (
-                                            <>
-                                                <ArrowUp className="w-4 h-4" />
-                                                Generate
-                                            </>
-                                        ) : (
-                                            <>
-                                                <ArrowUp className="w-4 h-4" />
-                                                Generate
-                                            </>
-                                        )}
+                                        <ArrowUp className="w-4 h-4" />
+                                        {isGenerating ? "Generating..." : "Generate"}
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -155,12 +150,13 @@ const Hero = () => {
             {/* Generated Images Section */}
             <div id="generated-section" className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
                 <div
-                    className={`grid gap-4 sm:gap-6 justify-items-center ${generatedImages.length === 1
-                        ? 'grid-cols-1 max-w-md mx-auto'
-                        : generatedImages.length === 2
-                            ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto'
-                            : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-                        }`}
+                    className={`grid gap-4 sm:gap-6 justify-items-center ${
+                        generatedImages.length === 1
+                            ? 'grid-cols-1 max-w-md mx-auto'
+                            : generatedImages.length === 2
+                                ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto'
+                                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                    }`}
                 >
                     {generatedImages.map((imageUrl, index) => (
                         <div
@@ -177,12 +173,8 @@ const Hero = () => {
                                     priority={index === 0}
                                 />
                             ) : (
-                                // Simple Skeleton Loader
                                 <div className="w-full aspect-square bg-gray-800 rounded-xl flex items-center justify-center relative overflow-hidden">
-                                    {/* Simple shimmer effect */}
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-600/30 to-transparent animate-[shimmer_2s_ease-in-out_infinite]"></div>
-                                    
-                                    {/* Simple loading content */}
                                     <div className="relative z-10 flex flex-col items-center justify-center space-y-3">
                                         <div className="w-8 h-8 border-2 border-gray-400 border-t-white rounded-full animate-spin"></div>
                                         <div className="text-gray-400 text-sm">Loading...</div>
@@ -194,7 +186,7 @@ const Hero = () => {
                 </div>
             </div>
         </>
-    )
-}
+    );
+};
 
-export default Hero
+export default Hero;

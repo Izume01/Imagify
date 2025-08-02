@@ -10,33 +10,33 @@ const dmSans = DM_Sans({
 const images = [
     {
         name: 'Mountains',
-        url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470'
+        url: 'https://res.cloudinary.com/dg9srfcis/image/upload/v1754114122/imgify/b5krmvaonfunntkrwvdw.jpg'
     },
     {
         name: 'Forest',
-        url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'
+        url: 'https://res.cloudinary.com/dg9srfcis/image/upload/v1754114221/imgify/gbolhktjga7dlkttyqsl.jpg'
     },
     {
         name: 'Cityscape',
-        url: 'https://images.unsplash.com/photo-1494526585095-c41746248156'
+        url: 'https://res.cloudinary.com/dg9srfcis/image/upload/v1754114233/imgify/prwf6xuiwnu6ekjoz7eo.jpg'
     },
 
     {
         name: 'Animal',
-        url: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d'
+        url: 'https://res.cloudinary.com/dg9srfcis/image/upload/v1754114233/imgify/prwf6xuiwnu6ekjoz7eo.jpg'
     },
 
     {
         name: 'Avatar PNG',
-        url: 'https://avatars.githubusercontent.com/u/9919?v=4'
+        url: 'https://res.cloudinary.com/dg9srfcis/image/upload/v1754111438/imgify/epzmp482zsbwwhmvhh5v.jpg'
     },
     {
         name: 'Sample AVIF',
-        url: 'https://res.cloudinary.com/demo/image/upload/sample.avif'
+        url: 'https://res.cloudinary.com/dg9srfcis/image/upload/v1754113910/imgify/qcgr0mnv9vja14wgvk6m.jpg'
     },
     {
         name: 'Sample WebP',
-        url: 'https://www.gstatic.com/webp/gallery/1.webp'
+        url: 'https://res.cloudinary.com/dg9srfcis/image/upload/v1754111318/imgify/abnqkoc6ziqsda364plb.jpg'
     }
 ]
 

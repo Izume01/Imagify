@@ -1,10 +1,14 @@
 "use client"
-import { Heart, ArrowUp, Plus, Minus } from 'lucide-react'
+import { Heart, ArrowUp, Plus, Minus, Download } from 'lucide-react'
 import React from 'react'
 import { clashDisplay } from '@/lib/fonts'
 import useAppStore from '@/store/appStore'
 import Image from 'next/image'
 import { BorderBeam } from './magicui/border-beam'
+import ImageWithDownload from './ImageWithDownload'
+import GenerationOptions from './GenerationOptions'
+import { downloadAllImages, generateFilenameFromPrompt } from '@/lib/downloadUtils'
+
 
 const Hero = () => {
     const {
@@ -15,7 +19,10 @@ const Hero = () => {
         generatedImages,
         setGeneratedImages,
         isGenerating,
-        setIsGenerating
+        setIsGenerating,
+        savePromptToHistory,
+        generationOptions,
+        addToGallery
     } = useAppStore();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -27,32 +34,78 @@ const Hero = () => {
         }
 
         setIsGenerating(true);
-        setGeneratedImages([]); // Clear previous images
+        setGeneratedImages([]); 
 
         const placeholders = Array(imageCount).fill(null);
         setGeneratedImages(placeholders);
 
         try {
+            let enhancedPrompt = userprompt.trim();
+            
+            if (generationOptions.style) {
+                enhancedPrompt += `, in ${generationOptions.style} style`;
+            }
+            if (generationOptions.mood) {
+                enhancedPrompt += `, ${generationOptions.mood} mood`;
+            }
+            if (generationOptions.colorScheme) {
+                enhancedPrompt += `, ${generationOptions.colorScheme} color scheme`;
+            }
+            if (generationOptions.quality) {
+                enhancedPrompt += `, ${generationOptions.quality} quality`;
+            }
+
+            console.log('🚀 Sending generate request:', { 
+                prompt: enhancedPrompt, 
+                count: imageCount, 
+                options: generationOptions 
+            });
+
             const response = await fetch("/api/generate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    prompt: userprompt,
-                    count: imageCount
+                    prompt: enhancedPrompt,
+                    count: imageCount,
+                    options: generationOptions
                 }),
             });
 
             const data = await response.json();
+            console.log('📡 Generate response:', { status: response.status, data });
 
             if (!response.ok) {
-                console.error("API Error:", data.error || "Unknown error");
+                console.error("❌ API Error:", data.error || "Unknown error");
                 return;
             }
 
+            console.log('🔍 Checking if data.image_urls exists:', { 
+                hasImageUrls: !!data.image_urls, 
+                imageUrls: data.image_urls,
+                dataKeys: Object.keys(data)
+            });
+
             if (data.image_urls) {
+                console.log('🎨 Images generated successfully:', data.image_urls);
                 setGeneratedImages(data.image_urls);
+                
+                addToGallery(data.image_urls);
+                
+                console.log('💾 About to save to history...', { 
+                    prompt: userprompt, 
+                    imageUrls: data.image_urls, 
+                    imageCount 
+                });
+                
+                try {
+                    await savePromptToHistory(userprompt, data.image_urls, imageCount);
+                    console.log('✅ Successfully saved to history');
+                } catch (error) {
+                    console.error('❌ Failed to save to history:', error);
+                }
+                
                 setTimeout(() => {
                     document.getElementById("generated-section")?.scrollIntoView({ behavior: "smooth" });
                 }, 100);
@@ -69,6 +122,17 @@ const Hero = () => {
         const newCount = increment ? imageCount + 1 : imageCount - 1;
         if (newCount >= 1 && newCount <= 4) {
             setImageCount(newCount);
+        }
+    };
+
+    const handleDownloadAll = async () => {
+        if (generatedImages.length === 0 || generatedImages.some(img => !img)) return;
+        
+        try {
+            const baseFilename = generateFilenameFromPrompt(userprompt).replace('.png', '');
+            await downloadAllImages(generatedImages, baseFilename);
+        } catch (error) {
+            console.error('Failed to download images:', error);
         }
     };
 
@@ -105,6 +169,8 @@ const Hero = () => {
                                         className="from-transparent via-blue-500 to-transparent !rounded-xl"
                                     />
                                 </div>
+
+                                <GenerationOptions />
 
                                 <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0">
                                     {/* Image Count Selector */}
@@ -149,6 +215,19 @@ const Hero = () => {
 
             {/* Generated Images Section */}
             <div id="generated-section" className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+                {/* Download All Button */}
+                {generatedImages.length > 0 && generatedImages.every(img => img) && (
+                    <div className="flex justify-center mb-6">
+                        <button
+                            onClick={handleDownloadAll}
+                            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                        >
+                            <Download className="w-4 h-4" />
+                            Download All Images
+                        </button>
+                    </div>
+                )}
+                
                 <div
                     className={`grid gap-4 sm:gap-6 justify-items-center ${
                         generatedImages.length === 1
@@ -164,13 +243,15 @@ const Hero = () => {
                             className="rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.02] bg-[#1e1e1e] p-1 sm:p-2 w-full max-w-[300px] sm:max-w-[400px]"
                         >
                             {imageUrl ? (
-                                <Image
+                                <ImageWithDownload
                                     src={imageUrl}
                                     alt={`Generated Image ${index + 1}`}
                                     width={400}
                                     height={400}
                                     className="w-full h-auto object-contain rounded-xl"
                                     priority={index === 0}
+                                    prompt={userprompt}
+                                    index={index}
                                 />
                             ) : (
                                 <div className="w-full aspect-square bg-gray-800 rounded-xl flex items-center justify-center relative overflow-hidden">

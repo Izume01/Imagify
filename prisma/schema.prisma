@@ -9,13 +9,22 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
-
 model FileMaker {
   id        String   @id @default(uuid())
   url       String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PromptHistory {
+  id          String   @id @default(uuid())
+  prompt      String
+  imageUrls   String[]  // Array of generated image URLs
+  imageCount  Int       // Number of images generated
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

@@ -13,7 +13,6 @@ const dmSans = DM_Sans({
 const Display = () => {
     const { promptHistory, fetchPromptHistory, isLoadingHistory } = useAppStore();
     
-    // Auto-load history when component mounts
     useEffect(() => {
         if (promptHistory.length === 0 && !isLoadingHistory) {
             fetchPromptHistory();
@@ -30,7 +29,6 @@ const Display = () => {
             })));
     }, [promptHistory]);
 
-    // Show loading state while fetching
     if (isLoadingHistory && promptHistory.length === 0) {
         return (
             <div className="p-4 sm:p-6 max-w-7xl mx-auto mt-20">

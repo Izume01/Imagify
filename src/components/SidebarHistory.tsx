@@ -1,8 +1,8 @@
 "use client"
 import React, { useEffect } from 'react'
-import { Search, Clock, RefreshCw, Trash2 } from 'lucide-react'
+import { Search, Clock, Trash2 } from 'lucide-react'
 import Image from 'next/image'
-import useAppStore, { PromptHistoryItem } from '@/store/appStore'
+import useAppStore from '@/store/appStore'
 
 const SidebarHistory = () => {
     const {
@@ -15,43 +15,19 @@ const SidebarHistory = () => {
         useHistoryPrompt
     } = useAppStore();
 
-    useEffect(() => {
-        if (promptHistory.length === 0) {
-            fetchPromptHistory();
-        }
-    }, [promptHistory.length, fetchPromptHistory]);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setHistorySearchTerm(e.target.value);
         fetchPromptHistory(e.target.value);
     };
 
-    const handleUsePrompt = (item: PromptHistoryItem) => {
-        useHistoryPrompt(item);
-    };
-
-    const handleDeleteItem = async (id: string, e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (confirm('Are you sure you want to delete this prompt from history?')) {
-            await deleteHistoryItem(id);
-        }
-    };
-
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        const now = new Date();
-        const diffTime = now.getTime() - date.getTime();
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 0) {
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        } else if (diffDays === 1) {
-            return 'Yesterday';
-        } else if (diffDays < 7) {
-            return `${diffDays} days ago`;
-        } else {
-            return date.toLocaleDateString();
-        }
+        const diffDays = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays === 0) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        return date.toLocaleDateString();
     };
 
     return (
@@ -92,7 +68,7 @@ const SidebarHistory = () => {
                             <div
                                 key={item.id}
                                 className="bg-[#222] rounded-lg p-3 hover:bg-[#2a2a2a] transition-colors cursor-pointer group"
-                                onClick={() => handleUsePrompt(item)}
+                                onClick={() => useHistoryPrompt(item)}
                             >
                                 <div className="flex items-start gap-3">
                                     {/* First image preview */}
@@ -122,25 +98,16 @@ const SidebarHistory = () => {
                                         </p>
                                     </div>
                                     
-                                    <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleUsePrompt(item);
-                                            }}
-                                            className="p-1 bg-purple-600 hover:bg-purple-700 rounded text-white transition-colors"
-                                            title="Use this prompt"
-                                        >
-                                            <RefreshCw className="w-3 h-3" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => handleDeleteItem(item.id, e)}
-                                            className="p-1 bg-red-600 hover:bg-red-700 rounded text-white transition-colors"
-                                            title="Delete from history"
-                                        >
-                                            <Trash2 className="w-3 h-3" />
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (confirm('Delete this prompt from history?')) deleteHistoryItem(item.id);
+                                        }}
+                                        className="p-1 bg-red-600/80 hover:bg-red-600 rounded text-white transition-all opacity-0 group-hover:opacity-100"
+                                        title="Delete"
+                                    >
+                                        <Trash2 className="w-3 h-3" />
+                                    </button>
                                 </div>
                                 
                                 {/* Additional images indicator */}

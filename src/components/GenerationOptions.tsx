@@ -75,6 +75,7 @@ const GenerationOptions = () => {
         <div className="bg-[#1e1e1e] rounded-xl border border-gray-700">
             {/* Header */}
             <button
+                type="button"
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="w-full flex items-center justify-between p-4 text-left hover:bg-[#252525] transition-colors rounded-xl"
             >
@@ -101,6 +102,7 @@ const GenerationOptions = () => {
                     {hasCustomOptions && (
                         <div className="pt-3">
                             <button
+                                type="button"
                                 onClick={resetOptions}
                                 className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
                             >

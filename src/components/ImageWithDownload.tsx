@@ -30,15 +30,8 @@ const ImageWithDownload: React.FC<ImageWithDownloadProps> = ({
     const handleDownload = async (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsDownloading(true);
-        
         try {
-            const filename = prompt 
-                ? generateFilenameFromPrompt(prompt, index)
-                : `imagify-${Date.now()}-${(index || 0) + 1}.png`;
-                
-            await downloadImage(src, filename);
-        } catch (error) {
-            console.error('Download failed:', error);
+            await downloadImage(src, prompt ? generateFilenameFromPrompt(prompt, index) : undefined);
         } finally {
             setIsDownloading(false);
         }

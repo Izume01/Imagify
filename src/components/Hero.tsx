@@ -28,91 +28,40 @@ const Hero = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!userprompt.trim()) {
-            console.log("Please enter a prompt");
-            return;
-        }
+        if (!userprompt.trim()) return;
 
         setIsGenerating(true);
-        setGeneratedImages([]); 
-
-        const placeholders = Array(imageCount).fill(null);
-        setGeneratedImages(placeholders);
+        setGeneratedImages(Array(imageCount).fill(null));
 
         try {
             let enhancedPrompt = userprompt.trim();
             
-            if (generationOptions.style) {
-                enhancedPrompt += `, in ${generationOptions.style} style`;
-            }
-            if (generationOptions.mood) {
-                enhancedPrompt += `, ${generationOptions.mood} mood`;
-            }
-            if (generationOptions.colorScheme) {
-                enhancedPrompt += `, ${generationOptions.colorScheme} color scheme`;
-            }
-            if (generationOptions.quality) {
-                enhancedPrompt += `, ${generationOptions.quality} quality`;
-            }
-
-            console.log('🚀 Sending generate request:', { 
-                prompt: enhancedPrompt, 
-                count: imageCount, 
-                options: generationOptions 
-            });
+            if (generationOptions.style) enhancedPrompt += `, in ${generationOptions.style} style`;
+            if (generationOptions.mood) enhancedPrompt += `, ${generationOptions.mood} mood`;
+            if (generationOptions.colorScheme) enhancedPrompt += `, ${generationOptions.colorScheme} color scheme`;
+            if (generationOptions.quality) enhancedPrompt += `, ${generationOptions.quality} quality`;
 
             const response = await fetch("/api/generate", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    prompt: enhancedPrompt,
-                    count: imageCount,
-                    options: generationOptions
-                }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt: enhancedPrompt, count: imageCount }),
             });
+
+            if (!response.ok) return;
 
             const data = await response.json();
-            console.log('📡 Generate response:', { status: response.status, data });
-
-            if (!response.ok) {
-                console.error("❌ API Error:", data.error || "Unknown error");
-                return;
-            }
-
-            console.log('🔍 Checking if data.image_urls exists:', { 
-                hasImageUrls: !!data.image_urls, 
-                imageUrls: data.image_urls,
-                dataKeys: Object.keys(data)
-            });
 
             if (data.image_urls) {
-                console.log('🎨 Images generated successfully:', data.image_urls);
                 setGeneratedImages(data.image_urls);
-                
                 addToGallery(data.image_urls);
-                
-                console.log('💾 About to save to history...', { 
-                    prompt: userprompt, 
-                    imageUrls: data.image_urls, 
-                    imageCount 
-                });
-                
-                try {
-                    await savePromptToHistory(userprompt, data.image_urls, imageCount);
-                    console.log('✅ Successfully saved to history');
-                } catch (error) {
-                    console.error('❌ Failed to save to history:', error);
-                }
+                await savePromptToHistory(userprompt, data.image_urls, imageCount);
                 
                 setTimeout(() => {
                     document.getElementById("generated-section")?.scrollIntoView({ behavior: "smooth" });
                 }, 100);
             }
-
         } catch (error) {
-            console.error("Error submitting form:", error);
+            console.error("Error generating images:", error);
         } finally {
             setIsGenerating(false);
         }

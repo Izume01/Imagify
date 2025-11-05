@@ -40,12 +40,10 @@ type AppStateProps = {
     
     promptHistory: PromptHistoryItem[];
     isLoadingHistory: boolean;
-    showHistory: boolean;
     historySearchTerm: string;
     setPromptHistory: (history: PromptHistoryItem[]) => void;
     addToPromptHistory: (item: PromptHistoryItem) => void;
     setIsLoadingHistory: (loading: boolean) => void;
-    setShowHistory: (show: boolean) => void;
     setHistorySearchTerm: (term: string) => void;
     fetchPromptHistory: (search?: string, limit?: number, offset?: number) => Promise<void>;
     savePromptToHistory: (prompt: string, imageUrls: string[], imageCount: number) => Promise<void>;
@@ -79,20 +77,17 @@ const useAppStore = create<AppStateProps>((set, get) => ({
     
     promptHistory: [],
     isLoadingHistory: false,
-    showHistory: false,
     historySearchTerm: "",
     setPromptHistory: (history: PromptHistoryItem[]) => set({ promptHistory: history }),
     addToPromptHistory: (item: PromptHistoryItem) => set((state) => ({ 
         promptHistory: [item, ...state.promptHistory] 
     })),
     setIsLoadingHistory: (loading: boolean) => set({ isLoadingHistory: loading }),
-    setShowHistory: (show: boolean) => set({ showHistory: show }),
     setHistorySearchTerm: (term: string) => set({ historySearchTerm: term }),
     
     fetchPromptHistory: async (search = "", limit = 20, offset = 0) => {
         set({ isLoadingHistory: true });
         try {
-            console.log('🔍 FETCH HISTORY CALLED:', { search, limit, offset });
             const params = new URLSearchParams({
                 limit: limit.toString(),
                 offset: offset.toString(),
@@ -101,7 +96,6 @@ const useAppStore = create<AppStateProps>((set, get) => ({
             
             const response = await fetch(`/api/history?${params}`);
             const data = await response.json();
-            console.log('📥 FETCH RESPONSE:', { status: response.status, data });
             
             if (response.ok) {
                 if (offset === 0) {
@@ -111,11 +105,9 @@ const useAppStore = create<AppStateProps>((set, get) => ({
                         promptHistory: [...state.promptHistory, ...data.history] 
                     }));
                 }
-            } else {
-                console.error('❌ Failed to fetch history:', data.error);
             }
         } catch (error) {
-            console.error('💥 Error fetching history:', error);
+            console.error('Failed to fetch history:', error);
         } finally {
             set({ isLoadingHistory: false });
         }
@@ -123,7 +115,6 @@ const useAppStore = create<AppStateProps>((set, get) => ({
     
     savePromptToHistory: async (prompt: string, imageUrls: string[], imageCount: number) => {
         try {
-            console.log('🚀 SAVE TO HISTORY CALLED!', { prompt, imageUrls, imageCount });
             const response = await fetch('/api/history', {
                 method: 'POST',
                 headers: {
@@ -137,16 +128,12 @@ const useAppStore = create<AppStateProps>((set, get) => ({
             });
             
             const data = await response.json();
-            console.log('📡 SAVE RESPONSE:', { status: response.status, data });
             
             if (response.ok) {
                 get().addToPromptHistory(data);
-                console.log('✅ Successfully saved to history');
-            } else {
-                console.error('❌ Failed to save to history:', data.error);
             }
         } catch (error) {
-            console.error('💥 Error saving to history:', error);
+            console.error('Failed to save to history:', error);
         }
     },
     
@@ -172,8 +159,7 @@ const useAppStore = create<AppStateProps>((set, get) => ({
     useHistoryPrompt: (historyItem: PromptHistoryItem) => {
         set({ 
             userprompt: historyItem.prompt,
-            imageCount: historyItem.imageCount,
-            showHistory: false 
+            imageCount: historyItem.imageCount
         });
     },
     

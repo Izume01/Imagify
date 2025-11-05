@@ -1,23 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0";
-const HUGGING_FACE_API_KEY = process.env.HUGGING_FACE_TOKEN!;
+const { CLOUDFLARE_API_KEY, CLOUDFLARE_ACCOUNT_ID, NEXT_PUBLIC_APP_URL } = process.env;
 
 const uploadToCloudinary = async (imageUrl: string) => {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-
-  const res = await fetch(`${baseUrl}/api/uploadFromUrl`, {
+  const res = await fetch(`${NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/uploadFromUrl`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ imageUrl }),
   });
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error('Cloudinary upload failed:', res.status, errorText);
-    throw new Error(`Upload failed: ${res.status} ${errorText}`);
-  }
-
+  if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
   const data = await res.json();
   return data.url;
 };
@@ -30,30 +22,38 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const imagePromises = Array.from({ length: count }, async () => {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${HUGGING_FACE_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ inputs: prompt.trim() })
-      });
+    const generateImage = async () => {
+      const response = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${CLOUDFLARE_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            prompt: prompt.trim(),
+            seed: Math.floor(Math.random() * 10000)
+          })
+        }
+      );
 
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`API error: ${response.status} ${errText}`);
+      if (!response.ok) throw new Error(`API error: ${response.status}`);
+
+      const result = await response.json();
+      if (!result.success || !result.result?.image) {
+        throw new Error('No image returned');
       }
 
-      const buffer = Buffer.from(await response.arrayBuffer());
-      const base64 = buffer.toString("base64");
-      const dataUrl = `data:image/png;base64,${base64}`;
-      const imageUrl = await uploadToCloudinary(dataUrl);
-      return imageUrl;
-    });
+      const binaryString = atob(result.result.image);
+      const img = Uint8Array.from(binaryString, (m) => m.codePointAt(0) || 0);
+      const base64 = Buffer.from(img).toString('base64');
+      const dataUrl = `data:image/jpeg;base64,${base64}`;
+      
+      return await uploadToCloudinary(dataUrl);
+    };
 
-    const imageUrls = await Promise.all(imagePromises);
-
+    const imageUrls = await Promise.all(Array(count).fill(null).map(generateImage));
     return NextResponse.json({ image_urls: imageUrls });
   } catch (error) {
     console.error("Error generating image:", error);

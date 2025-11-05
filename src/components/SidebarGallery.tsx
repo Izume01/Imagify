@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Search, Download, Grid3X3, Grid2X2, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import useAppStore from '@/store/appStore'
-import { downloadImage, generateFilenameFromPrompt } from '@/lib/downloadUtils'
+import { downloadImage } from '@/lib/downloadUtils'
 
 const SidebarGallery = () => {
     const {
@@ -30,34 +30,18 @@ const SidebarGallery = () => {
     const handleDownloadImage = async (imageUrl: string) => {
         setIsDownloading(imageUrl);
         try {
-            const filename = `imagify-gallery-${Date.now()}.png`;
-            await downloadImage(imageUrl, filename);
-        } catch (error) {
-            console.error('Download failed:', error);
+            await downloadImage(imageUrl);
         } finally {
             setIsDownloading(null);
         }
     };
 
     const filteredImages = gallerySearchTerm 
-        ? allGeneratedImages.filter((imageUrl, index) => {
-            const historyItem = promptHistory.find(item => 
-                item.imageUrls.includes(imageUrl)
-            );
+        ? allGeneratedImages.filter(imageUrl => {
+            const historyItem = promptHistory.find(item => item.imageUrls.includes(imageUrl));
             return historyItem?.prompt.toLowerCase().includes(gallerySearchTerm.toLowerCase());
         })
         : allGeneratedImages;
-
-    const getGridClasses = () => {
-        if (gridSize === 'small') {
-            return 'grid-cols-3 gap-2';
-        }
-        return 'grid-cols-2 gap-3';
-    };
-
-    const getImageSize = () => {
-        return gridSize === 'small' ? 80 : 120;
-    };
 
     return (
         <div className="flex flex-col h-full">
@@ -117,7 +101,7 @@ const SidebarGallery = () => {
                         </p>
                     </div>
                 ) : (
-                    <div className={`grid ${getGridClasses()}`}>
+                    <div className={`grid ${gridSize === 'small' ? 'grid-cols-3 gap-2' : 'grid-cols-2 gap-3'}`}>
                         {filteredImages.map((imageUrl, index) => {
                             const historyItem = promptHistory.find(item => 
                                 item.imageUrls.includes(imageUrl)
@@ -131,8 +115,8 @@ const SidebarGallery = () => {
                                     <Image
                                         src={imageUrl}
                                         alt={`Generated ${index + 1}`}
-                                        width={getImageSize()}
-                                        height={getImageSize()}
+                                        width={gridSize === 'small' ? 80 : 120}
+                                        height={gridSize === 'small' ? 80 : 120}
                                         className="w-full h-auto object-cover"
                                     />
                                     
